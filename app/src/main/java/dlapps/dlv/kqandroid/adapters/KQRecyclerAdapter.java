@@ -16,19 +16,15 @@ import dlapps.dlv.kqandroid.Utils.ModeType;
 
 /**
  * Created by DanielLujanApps on Sunday29/01/17.
+ *
  */
 
 public class KQRecyclerAdapter extends RecyclerView.Adapter<KQRecyclerAdapter.KQHolder> {
 
-//    private int[] mPlaydateResources = new int[]{R.drawable.pd1, R.drawable.pd2, R.drawable.pd3};
-//    private int[] mPromosResources = new int[]{R.drawable.promo1, R.drawable.promo1, R.drawable.promo1};
-//    private ModeType mCurrentMode = ModeType.PLAYDATES;
-
     private Context mContext;
     private ArrayList<String> mImages = new ArrayList<>();
 
-    public KQRecyclerAdapter(Context context, ModeType currentMode){
-//        mCurrentMode = currentMode;
+    public KQRecyclerAdapter(Context context){
         mContext = context;
     }
 
@@ -41,29 +37,21 @@ public class KQRecyclerAdapter extends RecyclerView.Adapter<KQRecyclerAdapter.KQ
 
     @Override
     public int getItemCount() {
-//        return mPlaydateResources.length;
         return mImages.size();
     }
 
     @Override
     public void onBindViewHolder(KQHolder holder, int position) {
-        int resource;
-//        if(mCurrentMode == ModeType.PLAYDATES) {
-//            resource = mPlaydateResources[position];
-//        }else{
-//            resource = mPromosResources[position];
-//        }
-
         Glide.with(mContext)
                 .load(mImages.get(position))
                 .fitCenter()
                 .into(holder.imageView);
     }
 
-    public static class KQHolder extends RecyclerView.ViewHolder{
+    static class KQHolder extends RecyclerView.ViewHolder{
 
-        public ImageView imageView;
-        public KQHolder(View itemView) {
+        ImageView imageView;
+        KQHolder(View itemView) {
             super(itemView);
             imageView = (ImageView) itemView.findViewById(R.id.recycler_image_item);
         }

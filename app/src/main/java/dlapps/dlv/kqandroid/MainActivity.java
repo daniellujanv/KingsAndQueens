@@ -1,85 +1,74 @@
 package dlapps.dlv.kqandroid;
 
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.contentful.java.cda.CDAArray;
-import com.contentful.java.cda.CDAAsset;
-import com.contentful.java.cda.CDAClient;
-import com.contentful.java.cda.CDAEntry;
-import com.contentful.java.cda.CDAResource;
-import com.contentful.java.cda.CDASpace;
-import com.contentful.vault.SyncCallback;
-import com.contentful.vault.SyncConfig;
-import com.contentful.vault.SyncResult;
-import com.contentful.vault.Vault;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
 
-import java.util.Collections;
-import java.util.List;
-
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import dlapps.dlv.kqandroid.Utils.KQContentful;
 import dlapps.dlv.kqandroid.Utils.ModeType;
 import dlapps.dlv.kqandroid.adapters.KQPagerAdapter;
 import dlapps.dlv.kqandroid.fragments.ContentFragment;
-import dlapps.dlv.kqandroid.objects.KQSpace;
-import dlapps.dlv.kqandroid.objects.Playdate;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Action1;
-import rx.schedulers.Schedulers;
+import dlapps.dlv.kqandroid.objects.Saloon;
 
 public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, TabLayout.OnTabSelectedListener {
 
     private final String TAG = getClass().getSimpleName();
-    Toolbar mToolbar;
-    CollapsingToolbarLayout mCollapsingToolbarLayout;
-    AppBarLayout mAppBarLayout;
-    TabLayout mTabLayout;
-    ViewPager mViewPager;
-    ImageView mInfoButton;
+
+    @BindView(R.id.main_toolbar) Toolbar mToolbar;
+    @BindView(R.id.main_collapsable_header) CollapsingToolbarLayout mCollapsingToolbarLayout;
+    @BindView(R.id.main_tablayout) TabLayout mTabLayout;
+    @BindView(R.id.main_content_view_pager) ViewPager mViewPager;
+    @BindView(R.id.main_content_info_button) ImageView mInfoButton;
+
+    private ArrayList<Saloon> mSaloons = new ArrayList<>();
 
     private KQPagerAdapter mKqAdapter;
-    private ModeType mCurrentMode;
+    private ModeType mCurrentMode = ModeType.PLAYDATES; //init w/playdates
+    private ContentFragment contentFragment;
+
     private int mCurrentSaloon = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         setTheme(R.style.AppTheme);
-        //TODO implement splashscreen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        ButterKnife.bind(this);
+        ButterKnife.bind(this);
+
+        KQContentful.getInstance(getApplicationContext())
+                .initVault(new KQContentful.OnVaulListener() {
+                    @Override
+                    public void onComplete(boolean result) {
+                        if(result){
+                            fetchSaloons();
+                        }else{
+                            Log.e(TAG, "Result false");
+                        }
+                    }
+
+                    @Override
+                    public void onException(Exception e) {
+                        Log.e(TAG, "initVault", e);
+                    }
+                });
 
         setSupportActionBar(mToolbar);
 
-        mToolbar = (Toolbar) findViewById(R.id.main_toolbar);
-        mCollapsingToolbarLayout  = (CollapsingToolbarLayout) findViewById(R.id.main_collapsable_header);
-        mAppBarLayout  = (AppBarLayout) findViewById(R.id.main_appbar);
-        mTabLayout  = (TabLayout) findViewById(R.id.main_tablayout);
-        mViewPager  = (ViewPager) findViewById(R.id.main_content_view_pager);
-        mInfoButton  = (ImageView) findViewById(R.id.main_content_info_button);
-
-//        mToolbar.setTitle(getString(R.string.app_name));
-
-        onModeSelected("Kings&Queens Plaza Serena", ModeType.PLAYDATES);
-
         mKqAdapter = new KQPagerAdapter(getApplicationContext(), mCollapsingToolbarLayout);
         mViewPager.setAdapter(mKqAdapter);
-
-        mCollapsingToolbarLayout.setTitle("Kings&Queens Plaza Serena");
 
         mViewPager.addOnPageChangeListener(this);
         mTabLayout.addOnTabSelectedListener(this);
@@ -87,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         mInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, mKqAdapter.mSaloons[mCurrentSaloon],
+                Toast.makeText(MainActivity.this, mKqAdapter.mSaloons.get(mCurrentSaloon).name,
                         Toast.LENGTH_SHORT).show();
             }
         });
@@ -98,18 +87,38 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         super.onResume();
     }
 
-    public void onModeSelected(String saloon, ModeType mode){
-
+    public void initContentFragment(Saloon saloon, ModeType mode){
         mCurrentMode = mode;
-        Fragment contentFragment = ContentFragment.newInstance(saloon, mode);
-        ((ContentFragment) contentFragment).setmTabLayout(mTabLayout);
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.main_content, contentFragment)
-                .commit();
+//        if(contentFragment == null){
+            contentFragment = ContentFragment.newInstance(mode);
+            contentFragment.setmTabLayout(mTabLayout);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.main_content, contentFragment)
+                    .commit();
+//        }else {
+//            contentFragment.changeMode(mCurrentMode);
+//        }
+    }
+
+    private void fetchSaloons(){
+        KQContentful.getInstance(getApplicationContext())
+            .fetchSaloonsVault(new KQContentful.OnSaloonsFetchedListener() {
+                @Override
+                public void onComplete(ArrayList<Saloon> saloons) {
+                    mSaloons = saloons;
+                    mKqAdapter.setSaloons(mSaloons);
+                    onPageSelected(0);
+                    initContentFragment(mSaloons.get(0), mCurrentMode);
+                }
+
+                @Override
+                public void onException(Exception e) {
+                    Log.e(TAG, "fetchSaloons", e);
+                }
+            });
     }
 
     /********  ViewPager Methods ***********/
-
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
     }
@@ -118,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
     public void onPageSelected(int position) {
         mCurrentSaloon = position;
         mKqAdapter.onPageChanged(mCurrentSaloon);
-        onModeSelected(mKqAdapter.mSaloons[mCurrentSaloon], mCurrentMode);
     }
 
     @Override

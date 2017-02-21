@@ -11,18 +11,22 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.data.StreamAssetPathFetcher;
+
+import java.util.ArrayList;
 
 import dlapps.dlv.kqandroid.R;
+import dlapps.dlv.kqandroid.objects.Saloon;
+import okhttp3.internal.http.StreamAllocation;
 
 /**
  * Created by DanielLujanApps on Sunday29/01/17.
+ *
  */
 
 public class KQPagerAdapter extends PagerAdapter {
 
-    public final String[] mSaloons = new String[]{
-            "Kings&Queens Plaza Serena", "Kings&Queens Plaza Chipinque"};
-    private final int[] mResources = new int[]{R.drawable.serena, R.drawable.chipinque};
+    public ArrayList<Saloon> mSaloons = new ArrayList<>();
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private Context mContext;
     private LayoutInflater mLayoutInflater;
@@ -41,7 +45,7 @@ public class KQPagerAdapter extends PagerAdapter {
         container.addView(itemView);
 
         Glide.with(mContext)
-                .load(mResources[position])
+                .load(mSaloons.get(position).image.url())
                 .centerCrop()
                 .placeholder(R.drawable.background_gradient)
                 . into(imageView);
@@ -51,7 +55,7 @@ public class KQPagerAdapter extends PagerAdapter {
 
     @Override
     public int getCount() {
-        return mSaloons.length;
+        return mSaloons.size();
     }
 
     @Override
@@ -60,6 +64,15 @@ public class KQPagerAdapter extends PagerAdapter {
     }
 
     public void onPageChanged(int position){
-        mCollapsingToolbarLayout.setTitle(mSaloons[position]);
+        mCollapsingToolbarLayout.setTitle(mSaloons.get(position).name);
+    }
+
+    public void setSaloons(ArrayList<Saloon> saloons){
+        if(saloons != null){
+            mSaloons = saloons;
+        }else{
+            mSaloons = new ArrayList<>();
+        }
+        notifyDataSetChanged();
     }
 }
