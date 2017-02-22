@@ -1,22 +1,17 @@
 package dlapps.dlv.kqandroid;
 
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
-import android.support.transition.Transition;
 import android.support.v4.app.ActivityOptionsCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.transition.Slide;
 import android.util.Log;
 import android.view.GestureDetector;
-import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
@@ -30,7 +25,6 @@ import dlapps.dlv.kqandroid.Utils.KQContentful;
 import dlapps.dlv.kqandroid.Utils.ModeType;
 import dlapps.dlv.kqandroid.adapters.KQPagerAdapter;
 import dlapps.dlv.kqandroid.fragments.ContentFragment;
-import dlapps.dlv.kqandroid.fragments.SaloonDetailsFragment;
 import dlapps.dlv.kqandroid.objects.Saloon;
 
 public class MainActivity extends AppCompatActivity implements
@@ -103,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 Saloon saloon = mKqAdapter.getCurrentSaloon(mViewPager.getCurrentItem());
-                initDetailsFragment(saloon);
+                initDetailsActivity(saloon);
             }
         });
     }
@@ -126,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements
 //        }
     }
 
-    public void initDetailsFragment(Saloon saloon) {
+    public void initDetailsActivity(Saloon saloon) {
         if(saloon != null) {
             Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
             overridePendingTransition(R.anim.slide_down, R.anim.slide_up);
@@ -135,14 +129,6 @@ public class MainActivity extends AppCompatActivity implements
                     makeSceneTransitionAnimation(this, mViewPager, getString(R.string.transition_image));
 
             startActivity(intent, options.toBundle());
-
-//            SaloonDetailsFragment detailsFragment = SaloonDetailsFragment.newInstance(saloon);
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                detailsFragment.setEnterTransition(new Slide(Gravity.TOP));
-//            }
-//            getSupportFragmentManager().beginTransaction()
-//                    .replace(R.id.main_content, detailsFragment)
-//                    .commit();
         }else{
             Toast.makeText(getApplicationContext(), "Error loading K&Q", Toast.LENGTH_SHORT).show();
         }
@@ -213,7 +199,7 @@ public class MainActivity extends AppCompatActivity implements
                                float velocityX, float velocityY) {
             Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
             if(event2.getY() < event1.getY()){
-                initDetailsFragment(mKqAdapter.getCurrentSaloon(mViewPager.getCurrentItem()));
+                initDetailsActivity(mKqAdapter.getCurrentSaloon(mViewPager.getCurrentItem()));
             }
             return false;
         }
