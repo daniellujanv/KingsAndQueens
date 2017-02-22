@@ -1,13 +1,23 @@
 package dlapps.dlv.kqandroid;
 
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.TabLayout;
+import android.support.transition.Transition;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.transition.Slide;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -20,19 +30,24 @@ import dlapps.dlv.kqandroid.Utils.KQContentful;
 import dlapps.dlv.kqandroid.Utils.ModeType;
 import dlapps.dlv.kqandroid.adapters.KQPagerAdapter;
 import dlapps.dlv.kqandroid.fragments.ContentFragment;
+import dlapps.dlv.kqandroid.fragments.SaloonDetailsFragment;
 import dlapps.dlv.kqandroid.objects.Saloon;
 
-public class MainActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, TabLayout.OnTabSelectedListener {
+public class MainActivity extends AppCompatActivity implements
+        ViewPager.OnPageChangeListener, TabLayout.OnTabSelectedListener {
 
     private final String TAG = getClass().getSimpleName();
 
     @BindView(R.id.main_toolbar) Toolbar mToolbar;
     @BindView(R.id.main_collapsable_header) CollapsingToolbarLayout mCollapsingToolbarLayout;
+    @BindView(R.id.main_appbar) AppBarLayout mAppBarLayout;
     @BindView(R.id.main_tablayout) TabLayout mTabLayout;
     @BindView(R.id.main_content_view_pager) ViewPager mViewPager;
     @BindView(R.id.main_content_info_button) ImageView mInfoButton;
 
     private ArrayList<Saloon> mSaloons = new ArrayList<>();
+
+    private GestureDetectorCompat mDetector;
 
     private KQPagerAdapter mKqAdapter;
     private ModeType mCurrentMode = ModeType.PLAYDATES; //init w/playdates
@@ -47,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         setContentView(R.layout.activity_main);
 
         ButterKnife.bind(this);
+
+        mDetector = new GestureDetectorCompat(this, new KQGestureListener());
 
         KQContentful.getInstance(getApplicationContext())
                 .initVault(new KQContentful.OnVaulListener() {
@@ -67,8 +84,17 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
         setSupportActionBar(mToolbar);
 
-        mKqAdapter = new KQPagerAdapter(getApplicationContext(), mCollapsingToolbarLayout);
+        mKqAdapter = new KQPagerAdapter(getApplicationContext(), mCollapsingToolbarLayout, mDetector);
         mViewPager.setAdapter(mKqAdapter);
+
+//        mViewPager.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                mDetector.onTouchEvent(motionEvent);
+//                return false;
+//            }
+//        });
+
 
         mViewPager.addOnPageChangeListener(this);
         mTabLayout.addOnTabSelectedListener(this);
@@ -76,8 +102,8 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
         mInfoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Toast.makeText(MainActivity.this, mKqAdapter.mSaloons.get(mCurrentSaloon).name,
-                        Toast.LENGTH_SHORT).show();
+                Saloon saloon = mKqAdapter.getCurrentSaloon(mViewPager.getCurrentItem());
+                initDetailsFragment(saloon);
             }
         });
     }
@@ -98,6 +124,28 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 //        }else {
 //            contentFragment.changeMode(mCurrentMode);
 //        }
+    }
+
+    public void initDetailsFragment(Saloon saloon) {
+        if(saloon != null) {
+            Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+            overridePendingTransition(R.anim.slide_down, R.anim.slide_up);
+
+            ActivityOptionsCompat options = ActivityOptionsCompat.
+                    makeSceneTransitionAnimation(this, mViewPager, getString(R.string.transition_image));
+
+            startActivity(intent, options.toBundle());
+
+//            SaloonDetailsFragment detailsFragment = SaloonDetailsFragment.newInstance(saloon);
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                detailsFragment.setEnterTransition(new Slide(Gravity.TOP));
+//            }
+//            getSupportFragmentManager().beginTransaction()
+//                    .replace(R.id.main_content, detailsFragment)
+//                    .commit();
+        }else{
+            Toast.makeText(getApplicationContext(), "Error loading K&Q", Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void fetchSaloons(){
@@ -151,4 +199,23 @@ public class MainActivity extends AppCompatActivity implements ViewPager.OnPageC
 
     }
 
+    class KQGestureListener extends GestureDetector.SimpleOnGestureListener {
+        private static final String DEBUG_TAG = "Gestures";
+
+        @Override
+        public boolean onDown(MotionEvent event) {
+            Log.d(DEBUG_TAG,"onDown: " + event.toString());
+            return false;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent event1, MotionEvent event2,
+                               float velocityX, float velocityY) {
+            Log.d(DEBUG_TAG, "onFling: " + event1.toString()+event2.toString());
+            if(event2.getY() < event1.getY()){
+                initDetailsFragment(mKqAdapter.getCurrentSaloon(mViewPager.getCurrentItem()));
+            }
+            return false;
+        }
+    }
 }

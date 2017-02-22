@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import dlapps.dlv.kqandroid.R;
 import dlapps.dlv.kqandroid.Utils.ModeType;
+import dlapps.dlv.kqandroid.fragments.ContentFragment;
 
 /**
  * Created by DanielLujanApps on Sunday29/01/17.

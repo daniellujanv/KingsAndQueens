@@ -2,9 +2,11 @@ package dlapps.dlv.kqandroid.adapters;
 
 import android.content.Context;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -30,11 +32,13 @@ public class KQPagerAdapter extends PagerAdapter {
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private Context mContext;
     private LayoutInflater mLayoutInflater;
+    GestureDetectorCompat mDetector;
 
-    public KQPagerAdapter(Context context, CollapsingToolbarLayout collapsingToolbarLayout){
+    public KQPagerAdapter(Context context, CollapsingToolbarLayout collapsingToolbarLayout, GestureDetectorCompat mDetector){
         mCollapsingToolbarLayout = collapsingToolbarLayout;
         mContext = context;
         mLayoutInflater = LayoutInflater.from(mContext);
+        this.mDetector = mDetector;
     }
 
     @Override
@@ -42,6 +46,15 @@ public class KQPagerAdapter extends PagerAdapter {
         View itemView = mLayoutInflater.inflate(R.layout.header_pager_item, container, false);
 
         ImageView imageView = (ImageView) itemView.findViewById(R.id.header_image_view);
+
+//        container.setOnTouchListener(new View.OnTouchListener() {
+//            @Override
+//            public boolean onTouch(View view, MotionEvent motionEvent) {
+//                mDetector.onTouchEvent(motionEvent);
+//                return false;
+//            }
+//        });
+
         container.addView(itemView);
 
         Glide.with(mContext)
@@ -74,5 +87,12 @@ public class KQPagerAdapter extends PagerAdapter {
             mSaloons = new ArrayList<>();
         }
         notifyDataSetChanged();
+    }
+
+    public Saloon getCurrentSaloon(int currentItem){
+        if(mSaloons.size() >= currentItem) {
+            return mSaloons.get(currentItem);
+        }
+        return null;
     }
 }
