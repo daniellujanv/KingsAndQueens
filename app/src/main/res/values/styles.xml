@@ -6,17 +6,26 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:colorBackground">@color/white</item>
+        <item name="android:background">@color/white</item>
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-
-
     </style>
 
+    <style name="KingsAndQueen.TextAppearance.AppCompat.Small.Pink.Light"
+        parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textColor">@color/md_pink_200</item>
+    </style>
     <style name="KingsAndQueen.TextAppearance.AppCompat.Pink.Light"
         parent="TextAppearance.AppCompat">
         <item name="android:textColor">@color/md_pink_200</item>
+    </style>
+    <style name="KingsAndQueen.TextAppearance.AppCompat.Pink.Medium"
+        parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/md_pink_400</item>
     </style>
     <style name="KingsAndQueen.TextAppearance.AppCompat.Medium"
         parent="TextAppearance.AppCompat.Medium">
@@ -25,6 +34,11 @@
     <style name="KingsAndQueen.TextAppearance.AppCompat.Medium.Blue.Light"
         parent="TextAppearance.AppCompat.Medium">
         <item name="android:textColor">@color/md_blue_50</item>
+    </style>
+
+    <style name="KingsAndQueen.TextAppearance.AppCompat.Title"
+        parent="TextAppearance.AppCompat.Title">
+        <item name="android:textColor">@color/md_pink_500</item>
     </style>
 
 </resources>

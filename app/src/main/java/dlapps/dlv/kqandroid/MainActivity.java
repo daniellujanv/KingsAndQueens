@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -26,6 +27,8 @@ import dlapps.dlv.kqandroid.Utils.ModeType;
 import dlapps.dlv.kqandroid.adapters.KQPagerAdapter;
 import dlapps.dlv.kqandroid.fragments.ContentFragment;
 import dlapps.dlv.kqandroid.objects.Saloon;
+
+import static dlapps.dlv.kqandroid.DetailsActivity.EXTRA_SALOON;
 
 public class MainActivity extends AppCompatActivity implements
         ViewPager.OnPageChangeListener, TabLayout.OnTabSelectedListener {
@@ -123,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements
     public void initDetailsActivity(Saloon saloon) {
         if(saloon != null) {
             Intent intent = new Intent(MainActivity.this, DetailsActivity.class);
+            intent.putExtra(EXTRA_SALOON, saloon);
             overridePendingTransition(R.anim.slide_down, R.anim.slide_up);
 
             ActivityOptionsCompat options = ActivityOptionsCompat.
