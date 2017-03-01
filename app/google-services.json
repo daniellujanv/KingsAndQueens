@@ -1,0 +1,53 @@
+{
+  "project_info": {
+    "project_number": "891004955530",
+    "firebase_url": "https://kingsandqueens-994.firebaseio.com",
+    "project_id": "kingsandqueens-994",
+    "storage_bucket": "kingsandqueens-994.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:891004955530:android:73b229cd244b89ac",
+        "android_client_info": {
+          "package_name": "dlapps.dlv.kqandroid"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "891004955530-itl0g92dl7sbkp4lvln2mgdbmh5ktu76.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "891004955530-hed4hq457tar6vojrh27na1ub00nhdnr.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "891004955530-jpugc61v1jlo4fe8jcggd3gvlitnk7qk.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCikYCU_SZBnq-rvLly0zU82zYBoq9motk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 2,
+          "analytics_property": {
+            "tracking_id": "UA-66830038-1"
+          }
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

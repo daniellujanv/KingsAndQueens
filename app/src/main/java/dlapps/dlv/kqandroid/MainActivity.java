@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.firebase.messaging.FirebaseMessaging;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements
         setTheme(R.style.AppTheme);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        FirebaseMessaging.getInstance().subscribeToTopic("all");
 
         ButterKnife.bind(this);
 
